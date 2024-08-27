@@ -1,0 +1,45 @@
+{
+ "actions": [],
+ "creation": "2024-08-01 09:37:55.427237",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "receiving_akad",
+  "table_miwg"
+ ],
+ "fields": [
+  {
+   "fieldname": "receiving_akad",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Receiving Akad",
+   "options": "Akad",
+   "reqd": 1
+  },
+  {
+   "fieldname": "table_miwg",
+   "fieldtype": "Table",
+   "options": "ZISWaf Akad Setting"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2024-08-01 09:56:46.450881",
+ "modified_by": "Administrator",
+ "module": "ZISWaf",
+ "name": "ZISWaf Setting",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "read": 1,
+   "role": "System Manager",
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
