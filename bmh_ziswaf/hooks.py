@@ -122,13 +122,16 @@ app_license = "gpl-3.0"
 # ---------------
 # Hook on document methods and events
 
-# doc_events = {
-# 	"*": {
-# 		"on_update": "method",
-# 		"on_cancel": "method",
-# 		"on_trash": "method"
-# 	}
-# }
+doc_events = {
+	"Cost Center": {
+		"after_rename": "bmh_ziswaf.event.erpnext.cost_center_after_rename",
+		"after_insert": "bmh_ziswaf.event.erpnext.cost_center_after_insert",
+		"after_delete": "bmh_ziswaf.event.erpnext.cost_center_after_delete"
+	},
+	"Asset": {
+		"before_insert": "bmh_ziswaf.event.erpnext.asset_before_insert"
+	}
+}
 
 # Scheduled Tasks
 # ---------------
@@ -227,3 +230,13 @@ app_license = "gpl-3.0"
 # 	"Logging DocType Name": 30  # days to retain logs
 # }
 
+fixtures = [
+	{
+		"dt": "Custom Field",
+		"filters": [["module", "=", "ZISWaf"]]
+	},
+	{
+		"dt": "Property Setter",
+		"filters": [["module", "=", "ZISWaf"]]
+	}
+]

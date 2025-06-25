@@ -1,0 +1,43 @@
+import frappe
+
+def cost_center_after_rename(doc, method=None, old_name=None, new_name=None, merge=False):
+  if not doc.is_group:
+    old_parts = old_name.split(" - ")
+    new_parts = new_name.split(" - ")
+    old_cost_center_number = old_parts[0] if len(old_parts) > 0 else ""
+    old_cost_center_name = old_parts[1] if len(old_parts) > 1 else ""
+    new_cost_center_number = new_parts[0] if len(new_parts) > 0 else ""
+    new_cost_center_name = new_parts[1] if len(new_parts) > 1 else ""
+    if old_cost_center_name != new_cost_center_name:
+      frappe.rename_doc('Branch', old_cost_center_name, new_cost_center_name)
+      frappe.rename_doc('Location', old_cost_center_name, new_cost_center_name)
+    if old_cost_center_number != new_cost_center_number:
+      frappe.db.set_value('Branch', new_cost_center_name, 'custom_prefix', new_cost_center_number[:3])
+      frappe.db.set_value('Location', new_cost_center_name, 'custom_prefix', new_cost_center_number[:3])
+
+def cost_center_after_insert(doc, method=None):
+  if doc.is_group == '0':
+    branch = frappe.new_doc('Branch')
+    branch.branch = doc.cost_center_name
+    branch.custom_cost_center = doc.name
+    if doc.cost_center_number:
+      branch.custom_cost_center_no = doc.cost_center_number
+      branch.custom_prefix = doc.cost_center_number[:3]
+    branch.insert(ignore_permissions=True)
+    location = frappe.new_doc('Location')
+    location.location_name = doc.cost_center_name
+    location.custom_cost_center = doc.name
+    if doc.cost_center_number:
+      location.custom_prefix = doc.cost_center_number[:3]
+    location.insert(ignore_permissions=True)
+
+def cost_center_after_delete(doc, method=None):
+  if not doc.is_group:
+    if frappe.db.exists('Branch', doc.cost_center_name):
+      branch = frappe.delete_doc('Branch', doc.cost_center_name)
+    if frappe.db.exists('Location', doc.cost_center_name):
+      branch = frappe.delete_doc('Location', doc.cost_center_name)
+
+def asset_before_insert(doc, method=None):
+  if doc.available_for_use_date:
+    doc.custom_available_year = frappe.utils.getdate(doc.available_for_use_date).year
