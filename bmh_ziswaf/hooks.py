@@ -130,7 +130,13 @@ doc_events = {
 	},
 	"Asset": {
 		"before_insert": "bmh_ziswaf.event.erpnext.asset_before_insert"
-	}
+	},
+	"Project Type": {
+		"autoname": "bmh_ziswaf.event.erpnext.project_type_autoname"
+	},
+	"Project": {
+		"autoname": "bmh_ziswaf.event.erpnext.project_autoname"
+	},
 }
 
 # Scheduled Tasks

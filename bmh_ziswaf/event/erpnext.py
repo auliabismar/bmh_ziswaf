@@ -30,14 +30,34 @@ def cost_center_after_insert(doc, method=None):
     if doc.cost_center_number:
       location.custom_prefix = doc.cost_center_number[:3]
     location.insert(ignore_permissions=True)
+  supplier = frappe.new_doc('Supplier')
+  supplier.name = doc.cost_center_number
+  supplier.supplier_name = doc.cost_center_name
+  supplier.supplier_type = 'Partnership'
+  supplier.db_insert()
+  customer = frappe.new_doc('Customer')
+  customer.name = doc.cost_center_number
+  customer.customer_name = doc.cost_center_name
+  customer.customer_type = 'Partnership'
+  customer.db_insert()
 
 def cost_center_after_delete(doc, method=None):
   if not doc.is_group:
-    if frappe.db.exists('Branch', doc.cost_center_name):
-      branch = frappe.delete_doc('Branch', doc.cost_center_name)
-    if frappe.db.exists('Location', doc.cost_center_name):
-      branch = frappe.delete_doc('Location', doc.cost_center_name)
+    frappe.delete_doc('Branch', doc.cost_center_name, ignore_missing=True, force=True)
+    frappe.delete_doc('Location', doc.cost_center_name, ignore_missing=True, force=True)
+  frappe.delete_doc('Supplier', doc.cost_center_number, ignore_missing=True, force=True)
+  frappe.delete_doc('Customer', doc.cost_center_number, ignore_missing=True, force=True)
 
 def asset_before_insert(doc, method=None):
   if doc.available_for_use_date:
     doc.custom_available_year = frappe.utils.getdate(doc.available_for_use_date).year
+
+def project_type_autoname(doc, method=None):
+  series_key = f".{doc.custom_abbreviation}.-.##"
+  new_name = frappe.model.naming.make_autoname(series_key, doc)
+  doc.name = new_name
+
+def project_autoname(doc, method=None):
+  series_key = f".{doc.project_type}.-.##"
+  new_name = frappe.model.naming.make_autoname(series_key, doc)
+  doc.name = new_name
