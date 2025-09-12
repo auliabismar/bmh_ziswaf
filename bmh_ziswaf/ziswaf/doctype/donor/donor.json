@@ -32,8 +32,10 @@
   {
    "fieldname": "branch",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Branch",
-   "options": "Branch"
+   "options": "Branch",
+   "reqd": 1
   },
   {
    "fetch_from": "branch.custom_prefix",
@@ -73,7 +75,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-09-12 21:27:28.412832",
+ "modified": "2025-09-12 21:52:17.951242",
  "modified_by": "Administrator",
  "module": "ZISWaf",
  "name": "Donor",

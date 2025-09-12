@@ -11,3 +11,8 @@ class Donor(Document):
 	
 	def on_trash(self):
 		delete_contact_and_address(self.doctype, self.name)
+
+	def autoname(self):
+		series_key = f"DON-.{self.branch_code}.-.#####"
+		new_name = frappe.model.naming.make_autoname(series_key, self)
+		self.name = new_name

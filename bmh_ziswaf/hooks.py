@@ -68,7 +68,7 @@ required_apps = ['erpnext']
 # ------------
 
 # before_install = "bmh_ziswaf.install.before_install"
-after_install = 'bmh_ziswaf.setup.setup_ziswaf'
+after_install = 'bmh_ziswaf.ziswaf.setup.setup_ziswaf'
 
 # Uninstallation
 # ------------
