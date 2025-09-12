@@ -4,7 +4,7 @@ app_publisher = "PT Karya Tata Bangsa"
 app_description = "BMH ZISWaf"
 app_email = "info@kataba.id"
 app_license = "gpl-3.0"
-# required_apps = []
+required_apps = ['erpnext']
 
 # Includes in <head>
 # ------------------
@@ -68,7 +68,7 @@ app_license = "gpl-3.0"
 # ------------
 
 # before_install = "bmh_ziswaf.install.before_install"
-# after_install = "bmh_ziswaf.install.after_install"
+after_install = 'bmh_ziswaf.setup.setup_ziswaf'
 
 # Uninstallation
 # ------------
