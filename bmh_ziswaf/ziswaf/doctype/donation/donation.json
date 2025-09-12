@@ -9,11 +9,18 @@
   "naming_series",
   "donor",
   "branch",
+  "branch_code",
+  "cost_center",
+  "journal_entry",
   "column_break_yyfi",
+  "company",
   "donation_date",
+  "cashbank_account",
   "total_donation",
+  "bank_reference_no",
   "section_break_ovgx",
-  "table_kwht",
+  "accounts",
+  "remark",
   "section_break_apfq",
   "amended_from"
  ],
@@ -62,14 +69,10 @@
    "fieldtype": "Section Break"
   },
   {
-   "fieldname": "table_kwht",
-   "fieldtype": "Table",
-   "options": "Donation Account"
-  },
-  {
    "fieldname": "total_donation",
    "fieldtype": "Currency",
    "label": "Total Donation",
+   "no_copy": 1,
    "non_negative": 1,
    "read_only": 1,
    "reqd": 1
@@ -78,15 +81,74 @@
    "fieldname": "branch",
    "fieldtype": "Link",
    "label": "Branch",
+   "no_copy": 1,
    "options": "Branch",
+   "reqd": 1,
+   "set_only_once": 1
+  },
+  {
+   "fieldname": "accounts",
+   "fieldtype": "Table",
+   "options": "Donation Account"
+  },
+  {
+   "fetch_from": "branch.custom_prefix",
+   "fieldname": "branch_code",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Branch Code",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "cashbank_account",
+   "fieldtype": "Link",
+   "label": "Cash/Bank Account",
+   "link_filters": "[[\"Account\",\"name\",\"descendants of\",\"1.01.01 - Kas dan setara kas - BMH\"],[\"Account\",\"is_group\",\"=\",0]]",
+   "options": "Account",
    "reqd": 1
+  },
+  {
+   "fetch_from": "branch.custom_cost_center",
+   "fieldname": "cost_center",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Cost Center",
+   "no_copy": 1,
+   "options": "Cost Center"
+  },
+  {
+   "fieldname": "journal_entry",
+   "fieldtype": "Link",
+   "label": "Journal Entry",
+   "no_copy": 1,
+   "options": "Journal Entry",
+   "read_only": 1
+  },
+  {
+   "fieldname": "bank_reference_no",
+   "fieldtype": "Data",
+   "label": "Bank Reference No",
+   "no_copy": 1,
+   "permlevel": 1
+  },
+  {
+   "fieldname": "remark",
+   "fieldtype": "Small Text",
+   "label": "Remark"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-09-12 22:06:09.063954",
+ "modified": "2025-09-13 04:31:31.996195",
  "modified_by": "Administrator",
  "module": "ZISWaf",
  "name": "Donation",

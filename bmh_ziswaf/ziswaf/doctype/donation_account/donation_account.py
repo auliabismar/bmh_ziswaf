@@ -6,4 +6,7 @@ from frappe.model.document import Document
 
 
 class DonationAccount(Document):
-	pass
+	def calculate_amount(self):
+		# This is a placeholder for the actual amount calculation logic.
+		# You should replace this with your own logic.
+		pass

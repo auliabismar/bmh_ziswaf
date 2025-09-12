@@ -13,6 +13,7 @@
   "branch",
   "branch_code",
   "contacts_tab",
+  "section_break_qkzb",
   "address_html",
   "column_break_iutc",
   "contact_html"
@@ -52,6 +53,7 @@
    "label": "Address & Contact"
   },
   {
+   "depends_on": "eval:!doc.__islocal",
    "fieldname": "address_html",
    "fieldtype": "HTML",
    "label": "Address HTML"
@@ -61,6 +63,7 @@
    "fieldtype": "Column Break"
   },
   {
+   "depends_on": "eval:!doc.__islocal",
    "fieldname": "contact_html",
    "fieldtype": "HTML",
    "label": "Contact HTML"
@@ -73,12 +76,17 @@
   {
    "fieldname": "column_break_kssz",
    "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:!doc.__islocal",
+   "fieldname": "section_break_qkzb",
+   "fieldtype": "Section Break"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-09-12 21:55:53.458596",
+ "modified": "2025-09-13 02:01:58.951078",
  "modified_by": "Administrator",
  "module": "ZISWaf",
  "name": "Donor",
@@ -100,7 +108,10 @@
  ],
  "quick_entry": 1,
  "row_format": "Dynamic",
+ "search_fields": "branch",
+ "show_title_field_in_link": 1,
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": []
+ "states": [],
+ "title_field": "donor_name"
 }
