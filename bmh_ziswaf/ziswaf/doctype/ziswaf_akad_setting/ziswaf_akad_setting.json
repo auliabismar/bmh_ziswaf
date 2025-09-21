@@ -7,6 +7,7 @@
  "engine": "InnoDB",
  "field_order": [
   "akad",
+  "against_account",
   "percentage"
  ],
  "fields": [
@@ -24,17 +25,27 @@
    "in_list_view": 1,
    "label": "Percentage",
    "reqd": 1
+  },
+  {
+   "fieldname": "against_account",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Against Account",
+   "link_filters": "[[\"Account\",\"is_group\",\"=\",0],[\"Account\",\"root_type\",\"=\",\"Income\"]]",
+   "options": "Account",
+   "reqd": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2024-08-01 09:56:12.050593",
+ "modified": "2025-09-13 07:29:25.454908",
  "modified_by": "Administrator",
  "module": "ZISWaf",
  "name": "ZISWaf Akad Setting",
  "owner": "Administrator",
  "permissions": [],
+ "row_format": "Dynamic",
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": []

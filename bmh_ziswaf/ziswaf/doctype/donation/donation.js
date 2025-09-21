@@ -1,7 +1,7 @@
 // Copyright (c) 2025, PT Karya Tata Bangsa and contributors
 // For license information, please see license.txt
 
-frappe.ui.form.on("Donation", {
+frappe.ui.form.on('Donation', {
 	refresh(frm) {
 		frm.trigger('calculate_total_donation');
 	},
@@ -32,6 +32,22 @@ frappe.ui.form.on("Donation", {
 frappe.ui.form.on('Donation Account', {
 	amount(frm, cdt, cdn) {
 		frm.trigger('calculate_total_donation');
+	},
+	account(frm, cdt, cdn) {
+		let child = locals[cdt][cdn]
+		if (!child.account) return;
+		frappe.db.get_doc('Account', child.account).then(account_doc => {
+			let akad_options = (account_doc.custom_akad || []).map(r => r.akad);
+			frm.fields_dict['accounts'].grid.get_field('akad').get_query = function(doc, cdt, cdn) {
+				return {
+					filters: [['Akad', 'name', 'in', akad_options]]
+				}
+			}
+			if (akad_options.length === 1) {
+				frappe.model.set_value(cdt, cdn, 'akad', akad_options[0])
+			}
+			frm.refresh_field('accounts')
+		});
 	},
 	accounts_remove(frm, cdt, cdn) {
 		frm.trigger('calculate_total_donation');
