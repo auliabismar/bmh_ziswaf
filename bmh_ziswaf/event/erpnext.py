@@ -61,3 +61,14 @@ def project_autoname(doc, method=None):
   series_key = f".{doc.project_type}.-.##"
   new_name = frappe.model.naming.make_autoname(series_key, doc)
   doc.name = new_name
+
+def journal_entry_on_cancel(doc, method):
+	donation = frappe.get_value(
+		"Donation",
+		{"journal_entry": doc.name},
+		"name"
+	)
+	if donation:
+		donation_doc = frappe.get_doc("Donation", donation)
+		if donation_doc.docstatus != 2:
+			donation_doc.cancel()

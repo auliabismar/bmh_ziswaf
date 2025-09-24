@@ -137,6 +137,9 @@ doc_events = {
 	"Project": {
 		"autoname": "bmh_ziswaf.event.erpnext.project_autoname"
 	},
+	"Journal Entry": {
+		"on_cancel": "bmh_ziswaf.event.erpnext.journal_entry_on_cancel"
+	},
 }
 
 # Scheduled Tasks
