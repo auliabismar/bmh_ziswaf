@@ -172,7 +172,7 @@ doc_events = {
 # ------------------------------
 #
 override_whitelisted_methods = {
-	"frappe.desk.doctype.event.event.get_events": "bmh_ziswaf.overrides.get_events"
+	"hrms.overrides.employee_payment_entry.get_payment_entry_for_employee": "bmh_ziswaf.overrides.get_payment_entry_for_employee"
 }
 #
 # each overriding function accepts a `data` argument;
