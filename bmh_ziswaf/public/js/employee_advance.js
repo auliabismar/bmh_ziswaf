@@ -6,7 +6,7 @@ frappe.ui.form.on('Employee Advance', {
 		frm.events.get_akad(frm);
 	},
 	get_akad(frm) {
-		if (frm.doc.advance_account) {
+		if (frm.doc.advance_account && frm.is_new()) {
 			frappe.db.get_doc('Account', frm.doc.advance_account).then(account_doc => {
 				let akad_options = (account_doc.custom_akad || []).map(r => r.akad);
 				frm.set_query('custom_akad', () => {
