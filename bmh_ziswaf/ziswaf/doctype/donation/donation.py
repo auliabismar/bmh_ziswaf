@@ -9,6 +9,7 @@ class Donation(Document):
 	def on_submit(self):
 		journal_entry = self._create_journal_entry()
 		self._process_accounts(journal_entry)
+		self._validate_balance(journal_entry)
 		journal_entry.save()
 		journal_entry.submit()
 		self.db_set('journal_entry', journal_entry.name)
@@ -63,6 +64,7 @@ class Donation(Document):
 					'amount': account.amount - amount,
 					'akad': receiving_akad,
 					'cost_center': self.cost_center,
+					'project': account.project,
 					'note': account.note,
 				})
 			else:
@@ -106,3 +108,12 @@ class Donation(Document):
 					'user_remark': account.get('note'),
 				},
 			)
+			
+	def _validate_balance(self, journal_entry):
+		total_debit = sum(entry.debit_in_account_currency 
+			for entry in journal_entry.accounts if entry.debit_in_account_currency)
+		total_credit = sum(entry.credit_in_account_currency 
+			for entry in journal_entry.accounts if entry.credit_in_account_currency)
+		if total_debit != total_credit:
+			frappe.throw(_('Total Debit {0} and Total Credit {1} must be equal').format(
+				total_debit, total_credit))
