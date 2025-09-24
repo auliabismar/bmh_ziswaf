@@ -36,6 +36,8 @@ class Donation(Document):
 
 	def _get_akad_settings(self):
 		receiving_akad = frappe.get_single_value('ZISWaf Setting', 'receiving_akad')
+		if not receiving_akad:
+			frappe.throw('Receiving Akad in ZISWaf Setting is not found. Please contact Administrator.')
 		akad_list = frappe.get_all(
       'ZISWaf Akad Setting', fields=['akad', 'percentage', 'against_account']
     )

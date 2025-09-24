@@ -172,7 +172,8 @@ doc_events = {
 # ------------------------------
 #
 override_whitelisted_methods = {
-	"hrms.overrides.employee_payment_entry.get_payment_entry_for_employee": "bmh_ziswaf.overrides.get_payment_entry_for_employee"
+	"hrms.overrides.employee_payment_entry.get_payment_entry_for_employee": 
+  "bmh_ziswaf.overrides.get_payment_entry_for_employee"
 }
 #
 # each overriding function accepts a `data` argument;
