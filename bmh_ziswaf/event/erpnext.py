@@ -64,10 +64,7 @@ def project_autoname(doc, method=None):
 
 def journal_entry_on_cancel(doc, method):
 	donation = frappe.get_value(
-		"Donation",
-		{"journal_entry": doc.name},
-		"name"
-	)
+		"Donation", {"journal_entry": doc.name}, "name")
 	if donation:
 		donation_doc = frappe.get_doc("Donation", donation)
 		if donation_doc.docstatus != 2:
