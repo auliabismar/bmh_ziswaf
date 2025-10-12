@@ -6,9 +6,20 @@ frappe.ui.form.on('Donation', {
 		frm.trigger('calculate_total_donation');
 	},
 	validate(frm) {
-		if (frm.doc.total_donation <= 0) {
-			frappe.throw(__('Total Donation must be greater than 0'));
+		if (frm.doc.docstatus === 0) {
+			if (frm.doc.total_donation <= 0) {
+				frappe.throw(__('Total Donation must be greater than 0'));
+			}
+			frm.trigger('validate_unique_accounts');
 		}
+	},
+	cost_center(frm) {
+		if (frm.doc.accounts) {
+			frm.doc.accounts.forEach(function (d) {
+				d.cost_center = frm.doc.cost_center;
+			});
+		}
+		frm.refresh_field('accounts');
 	},
 	calculate_total_donation(frm) {
 		let total_donation = 0;
@@ -19,13 +30,27 @@ frappe.ui.form.on('Donation', {
 		}
 		frm.set_value('total_donation', total_donation);
 	},
-	cost_center(frm) {
-		if (frm.doc.accounts) {
-			frm.doc.accounts.forEach(function (d) {
-				d.cost_center = frm.doc.cost_center;
-			});
-		}
-		frm.refresh_field('accounts');
+	validate_unique_accounts(frm) {
+		let accounts = frm.doc.accounts || [];
+		let combinations = {};
+		let has_duplicate = false;
+		accounts.forEach(function(row, idx) {
+			if (!row.account || !row.cost_center || !row.akad) return;
+			let key = `${row.account}|${row.cost_center}|${row.akad}|${row.project || ''}`;
+			if (combinations[key]) {
+				has_duplicate = true;
+				frappe.msgprint({
+					title: __('Duplicate Entry'),
+					indicator: 'red',
+					message: __('Row {0}: Duplicate combination of Account, Cost Center, Akad and Project found in Row {1}',
+						[idx + 1, combinations[key]])
+				})
+				frappe.validated = false;
+			} else {
+				combinations[key] = idx + 1;
+			}
+		})
+		return !has_duplicate;
 	}
 });
 
@@ -48,6 +73,16 @@ frappe.ui.form.on('Donation Account', {
 			}
 			frm.refresh_field('accounts')
 		});
+		frm.trigger('validate_unique_accounts');
+	},
+	cost_center(frm, cdt, cdn) {
+		frm.trigger('validate_unique_accounts');
+	},
+	akad(frm, cdt, cdn) {
+		frm.trigger('validate_unique_accounts');
+	},
+	project(frm, cdt, cdn) {
+		frm.trigger('validate_unique_accounts');
 	},
 	accounts_remove(frm, cdt, cdn) {
 		frm.trigger('calculate_total_donation');

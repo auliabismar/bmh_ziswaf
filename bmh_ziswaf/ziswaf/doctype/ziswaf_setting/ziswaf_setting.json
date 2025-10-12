@@ -5,7 +5,12 @@
  "engine": "InnoDB",
  "field_order": [
   "receiving_akad",
-  "table_miwg"
+  "table_miwg",
+  "infak_category_list_section",
+  "infak_terikat",
+  "csr",
+  "column_break_bczv",
+  "infak_tidak_terikat"
  ],
  "fields": [
   {
@@ -20,12 +25,39 @@
    "fieldname": "table_miwg",
    "fieldtype": "Table",
    "options": "ZISWaf Akad Setting"
+  },
+  {
+   "fieldname": "infak_category_list_section",
+   "fieldtype": "Section Break",
+   "label": "Infak Category List"
+  },
+  {
+   "fieldname": "infak_terikat",
+   "fieldtype": "Table MultiSelect",
+   "label": "Infak Terikat",
+   "options": "ZISWaf Setting Account"
+  },
+  {
+   "fieldname": "column_break_bczv",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "infak_tidak_terikat",
+   "fieldtype": "Table MultiSelect",
+   "label": "Infak Tidak Terikat",
+   "options": "ZISWaf Setting Account"
+  },
+  {
+   "fieldname": "csr",
+   "fieldtype": "Table MultiSelect",
+   "label": "CSR",
+   "options": "ZISWaf Setting Account"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2024-08-01 09:56:46.450881",
+ "modified": "2025-10-12 15:26:12.682279",
  "modified_by": "Administrator",
  "module": "ZISWaf",
  "name": "ZISWaf Setting",
@@ -39,6 +71,7 @@
    "write": 1
   }
  ],
+ "row_format": "Dynamic",
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": []

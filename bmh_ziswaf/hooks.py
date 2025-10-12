@@ -114,9 +114,9 @@ after_install = 'bmh_ziswaf.ziswaf.setup.setup_ziswaf'
 # ---------------
 # Override standard doctype classes
 
-# override_doctype_class = {
-# 	"ToDo": "custom_app.overrides.CustomToDo"
-# }
+override_doctype_class = {
+	"Payment Entry": "bmh_ziswaf.overrides.payment_entry.CustomPaymentEntry"
+}
 
 # Document Events
 # ---------------
@@ -133,6 +133,9 @@ doc_events = {
 	},
 	"Project Type": {
 		"autoname": "bmh_ziswaf.event.erpnext.project_type_autoname"
+	},
+  "Payment Entry": {
+		"before_submit": "bmh_ziswaf.event.erpnext.payment_entry_before_submit"
 	},
 	"Project": {
 		"autoname": "bmh_ziswaf.event.erpnext.project_autoname"
@@ -173,7 +176,7 @@ doc_events = {
 #
 override_whitelisted_methods = {
 	"hrms.overrides.employee_payment_entry.get_payment_entry_for_employee": 
-  "bmh_ziswaf.overrides.get_payment_entry_for_employee"
+  "bmh_ziswaf.overrides.erpnext.get_payment_entry_for_employee"
 }
 #
 # each overriding function accepts a `data` argument;

@@ -7,113 +7,108 @@ from frappe import _
 
 class Donation(Document):
 	def on_submit(self):
-		journal_entry = self._create_journal_entry()
-		self._process_accounts(journal_entry)
-		self._validate_balance(journal_entry)
-		journal_entry.save()
-		journal_entry.submit()
-		self.db_set('journal_entry', journal_entry.name)
+		journal_entry_name = self._create_journal_entry()
+		self.db_set('journal_entry', journal_entry_name)
 
 	def on_cancel(self):
 		if self.journal_entry:
-			journal_entry = frappe.get_doc('Journal Entry', self.journal_entry)
-			journal_entry.cancel()
+			frappe.get_doc('Journal Entry', self.journal_entry).cancel()
 
 	def _create_journal_entry(self):
 		journal_entry = frappe.new_doc('Journal Entry')
 		journal_entry.posting_date = self.donation_date
 		journal_entry.user_remark = self.remark
+		journal_entry.company = self.company
 		if self.bank_reference_no:
 			journal_entry.cheque_no = self.bank_reference_no
 			journal_entry.cheque_date = self.donation_date
-		journal_entry.company = self.company
-		return journal_entry
+		akad_settings = get_akad_settings()
+		self._create_ziswaf_receive_rows(journal_entry)
+		self._create_amil_allocation_rows(journal_entry, akad_settings)
+		journal_entry.save()
+		journal_entry.submit()
+		return journal_entry.name
 
-	def _process_accounts(self, journal_entry):
-		receiving_akad, akad_settings = self._get_akad_settings()
-		processed_accounts = self._get_processed_accounts(receiving_akad, akad_settings)
-		self._append_debit_entries(journal_entry, processed_accounts)
-		self._append_credit_entries(journal_entry, processed_accounts, receiving_akad)
-
-	def _get_akad_settings(self):
-		receiving_akad = frappe.get_single_value('ZISWaf Setting', 'receiving_akad')
-		if not receiving_akad:
-			frappe.throw('Receiving Akad in ZISWaf Setting is not found. Please contact Administrator.')
-		akad_list = frappe.get_all(
-      'ZISWaf Akad Setting', fields=['akad', 'percentage', 'against_account']
-    )
-		akad_settings = {item['akad']: item for item in akad_list}
-		return receiving_akad, akad_settings
-	
-	def _get_processed_accounts(self, receiving_akad, akad_settings):
-		process_accounts = []
+	def _create_ziswaf_receive_rows(self, journal_entry):
 		for account in self.accounts:
-			akad_setting = akad_settings.get(account.akad)
-			if akad_setting and account.akad != receiving_akad:
-				amount = account.amount * akad_setting.percentage / 100
-				process_accounts.append({
-					'account': account.account,
-					'amount': amount,
-					'akad': account.akad,
-					'cost_center': self.cost_center,
-					'project': account.project,
-					'note': account.note,
-				})
-				process_accounts.append({
-					'account': akad_setting.against_account,
-					'amount': account.amount - amount,
-					'akad': receiving_akad,
-					'cost_center': self.cost_center,
-					'project': account.project,
-					'note': account.note,
-				})
-			else:
-				process_accounts.append({
-					'account': account.account,
-					'amount': account.amount,
-					'akad': account.akad,
-					'cost_center': self.cost_center,
-					'project': account.project,
-					'note': account.note,
-				})
-		return process_accounts
-	
-	def _append_debit_entries(self, journal_entry, processed_accounts):
-		debit_account = {}
-		for account in processed_accounts:
-			key = (account.get('akad'), self.cashbank_account)
-			debit_account.setdefault(key, 0)
-			debit_account[key] += account.get('amount')
-		for key, amount in debit_account.items():
+			journal_entry.append('accounts', {
+				'account': account.account,
+				'credit_in_account_currency': account.amount,
+				'party_type': 'Donor',
+				'party': self.donor,
+				'cost_center': account.cost_center,
+				'akad': account.akad,
+				'project': account.project,
+			})
 			journal_entry.append('accounts', {
 				'account': self.cashbank_account,
-				'debit_in_account_currency': amount,
-				'cost_center': self.cost_center,
-				'akad': key[0]
+				'debit_in_account_currency': account.amount,
+				'cost_center': account.cost_center,
+				'akad': account.akad,
+				'project': account.project,
 			})
 
-	def _append_credit_entries(self, journal_entry, processed_accounts, receiving_akad):
-		for account in processed_accounts:
-			is_donor_entry = account.get('account') != receiving_akad
-			journal_entry.append(
-				'accounts',
-				{
-					'account': account.get('account'),
-					'credit_in_account_currency': account.get('amount'),
-					'party_type': 'Donor' if is_donor_entry else None,
-					'party': self.donor if is_donor_entry else None,
-					'cost_center': account.get('cost_center'),
-					'akad': account.get('akad'),
-					'project': account.get('project'),
-					'user_remark': account.get('note'),
-				},
-			)
+	def _create_amil_allocation_rows(self, journal_entry, settings):
+		akad_setting = settings['akad_settings']
+		for account in self.accounts:
+			key =  account.akad
+			if key == 'Infak':
+				if account.account in settings['infak_terikat']:
+					key = f'{account.akad}-Terikat'
+				elif account.account in settings['infak_tidak_terikat']:
+					key = f'{account.akad}-Tidak Terikat'
+			setting = akad_setting.get(key)
+			if not setting:
+				frappe.throw(_('Akad Setting for {0} is not found. Please contact Administrator.').format(key))
+			journal_entry.append('accounts', {
+				'account': setting['amil_allocation_account'],
+				'debit_in_account_currency': account.amount * setting['percentage'] / 100,
+				'cost_center': account.cost_center,
+				'akad': account.akad,
+				'project': account.project,
+			})
+			journal_entry.append('accounts', {
+				'account': self.cashbank_account,
+				'credit_in_account_currency': account.amount * setting['percentage'] / 100,
+				'cost_center': account.cost_center,
+				'akad': account.akad,
+				'project': account.project,
+			})
+			journal_entry.append('accounts', {
+				'account': self.cashbank_account,
+				'debit_in_account_currency': account.amount * setting['percentage'] / 100,
+				'cost_center': account.cost_center,
+				'akad': settings['receiving_akad'],
+			})
+			journal_entry.append('accounts', {
+				'account': setting['against_account'],
+				'credit_in_account_currency': account.amount * setting['percentage'] / 100,
+				'cost_center': account.cost_center,
+				'akad': settings['receiving_akad'],
+			})
 			
-	def _validate_balance(self, journal_entry):
-		total_debit = sum(entry.debit_in_account_currency 
-			for entry in journal_entry.accounts if entry.debit_in_account_currency)
-		total_credit = sum(entry.credit_in_account_currency 
-			for entry in journal_entry.accounts if entry.credit_in_account_currency)
-		if total_debit != total_credit:
-			frappe.throw(_('Total Debit {0} and Total Credit {1} must be equal').format(
-				total_debit, total_credit))
+def get_akad_settings():
+	receiving_akad = frappe.get_single_value('ZISWaf Setting', 'receiving_akad')
+	if not receiving_akad:
+		frappe.throw('Receiving Akad in ZISWaf Setting is not found. Please contact Administrator.')
+	akad_list = frappe.get_all('ZISWaf Akad Setting', 
+		fields=['akad', 'percentage', 'against_account', 'amil_allocation_account', 'infak_type'])
+	infak_terikat = frappe.get_all('ZISWaf Setting Account', 
+		filters={'parentfield': 'infak_terikat'}, pluck='account')
+	infak_tidak_terikat = frappe.get_all('ZISWaf Setting Account', 
+		filters={'parentfield': 'infak_tidak_terikat'}, pluck='account')
+	csr = frappe.get_all('ZISWaf Setting Account', 
+		filters={'parentfield': 'csr'}, pluck='account')
+	if not akad_list:
+		frappe.throw('ZISWaf Akad Setting is not found. Please contact Administrator.')
+	akad_settings = {}
+	for item in akad_list:
+		key = item['akad'] if not item.get('infak_type') else f"{item['akad']}-{item['infak_type']}"
+		akad_settings[key] = {k: v for k, v in item.items() if k != 'infak_type'}
+	return {
+		'receiving_akad': receiving_akad,
+		'akad_settings': akad_settings,
+		'infak_terikat': infak_terikat,
+		'infak_tidak_terikat': infak_tidak_terikat,
+		'csr': csr
+	}

@@ -8,7 +8,9 @@
  "field_order": [
   "akad",
   "against_account",
-  "percentage"
+  "percentage",
+  "amil_allocation_account",
+  "infak_type"
  ],
  "fields": [
   {
@@ -23,7 +25,7 @@
    "fieldname": "percentage",
    "fieldtype": "Percent",
    "in_list_view": 1,
-   "label": "Percentage",
+   "label": "Amil Percentage",
    "reqd": 1
   },
   {
@@ -34,12 +36,31 @@
    "link_filters": "[[\"Account\",\"is_group\",\"=\",0],[\"Account\",\"root_type\",\"=\",\"Income\"]]",
    "options": "Account",
    "reqd": 1
+  },
+  {
+   "fieldname": "amil_allocation_account",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Amil Allocation Account",
+   "link_filters": "[[\"Account\",\"root_type\",\"=\",\"Expense\"],[\"Account\",\"is_group\",\"=\",0]]",
+   "options": "Account",
+   "reqd": 1
+  },
+  {
+   "depends_on": "eval:doc.akad==='Infak'",
+   "fieldname": "infak_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Infak Type",
+   "mandatory_depends_on": "eval:doc.akad==='Infak'",
+   "options": "Terikat\nTidak Terikat\nCSR",
+   "read_only_depends_on": "eval:doc.akad!=='Infak'"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-09-13 07:29:25.454908",
+ "modified": "2025-10-12 17:07:17.087874",
  "modified_by": "Administrator",
  "module": "ZISWaf",
  "name": "ZISWaf Akad Setting",
