@@ -5,11 +5,12 @@ frappe.ui.form.on('Employee Advance', {
 	advance_account(frm) {
 		frm.events.get_akad(frm);
 	},
-	cost_center(frm) {
+	custom_cost_center(frm) {
+		frm.toggle_display('mode_of_payment', !!frm.doc.custom_cost_center);
 		frm.set_query('mode_of_payment', () => {
 			return {
 				filters: {
-					custom_cost_center: frm.doc.cost_center,
+					custom_cost_center: frm.doc.custom_cost_center,
 					enabled: 1,
 				}
 			}
