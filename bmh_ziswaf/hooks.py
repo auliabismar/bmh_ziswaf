@@ -28,7 +28,10 @@ required_apps = ['erpnext']
 # page_js = {"page" : "public/js/file.js"}
 
 # include js in doctype views
-doctype_js = {"Employee Advance" : "public/js/employee_advance.js"}
+doctype_js = {
+  "Employee Advance" : "public/js/employee_advance.js",
+  "Expense Claim" : "public/js/expense_claim.js",
+}
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
