@@ -118,7 +118,8 @@ after_install = 'bmh_ziswaf.ziswaf.setup.setup_ziswaf'
 # Override standard doctype classes
 
 override_doctype_class = {
-	"Payment Entry": "bmh_ziswaf.overrides.payment_entry.CustomPaymentEntry"
+	"Payment Entry": "bmh_ziswaf.overrides.payment_entry.CustomPaymentEntry",
+	"Loan": "bmh_ziswaf.overrides.loan.CustomLoan",
 }
 
 # Document Events
@@ -126,16 +127,19 @@ override_doctype_class = {
 # Hook on document methods and events
 
 doc_events = {
+	"Asset": {
+		"before_insert": "bmh_ziswaf.event.erpnext.asset_before_insert"
+	},
 	"Cost Center": {
 		"after_rename": "bmh_ziswaf.event.erpnext.cost_center_after_rename",
 		"after_insert": "bmh_ziswaf.event.erpnext.cost_center_after_insert",
 		"after_delete": "bmh_ziswaf.event.erpnext.cost_center_after_delete"
 	},
-	"Asset": {
-		"before_insert": "bmh_ziswaf.event.erpnext.asset_before_insert"
-	},
-	"Project Type": {
-		"autoname": "bmh_ziswaf.event.erpnext.project_type_autoname"
+	"Employee Advance": {
+		"on_submit": "bmh_ziswaf.event.erpnext.employee_advance_on_submit"
+	},  
+	"Journal Entry": {
+		"on_cancel": "bmh_ziswaf.event.erpnext.journal_entry_on_cancel"
 	},
   "Payment Entry": {
 		"before_submit": "bmh_ziswaf.event.erpnext.payment_entry_before_submit"
@@ -143,8 +147,8 @@ doc_events = {
 	"Project": {
 		"autoname": "bmh_ziswaf.event.erpnext.project_autoname"
 	},
-	"Journal Entry": {
-		"on_cancel": "bmh_ziswaf.event.erpnext.journal_entry_on_cancel"
+	"Project Type": {
+		"autoname": "bmh_ziswaf.event.erpnext.project_type_autoname"
 	},
 }
 

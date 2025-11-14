@@ -76,3 +76,52 @@ def payment_entry_before_submit(doc, method):
 	has_incomplete_ref = not doc.reference_no or not doc.reference_date
 	if needs_reference and has_incomplete_ref:
 		frappe.throw("Reference No and Reference Date are required for Payment Entry with Bank Account.")
+
+def employee_advance_on_submit(doc, method):
+	account = frappe.db.get_value('Mode of Payment Account', 
+		{'parent': doc.mode_of_payment, 'company': doc.company}, 'default_account')
+	bank_account = frappe.db.get_value('Bank Account', 
+		{'account': account, 'company': doc.company, 'disabled': 0}, 'name')
+	party_bank_account = frappe.db.get_value('Bank Account', 
+		{'party_type': 'Employee', 'party': doc.employee, 'disabled': 0}, 'name')
+	pe = frappe.new_doc('Payment Entry')
+	pe.payment_type = 'Pay'
+	pe.company = doc.company
+	pe.cost_center = doc.custom_cost_center
+	pe.akad = doc.custom_akad
+	pe.project = doc.custom_project
+	pe.posting_date = frappe.utils.nowdate()
+	pe.mode_of_payment = doc.mode_of_payment
+	pe.party_type = 'Employee'
+	pe.party = doc.employee
+	pe.contact_email = frappe.db.get_value('Employee', doc.employee, 'prefered_email')
+	pe.paid_from = account
+	pe.paid_to = doc.advance_account
+	pe.paid_from_account_currency = 'IDR'
+	pe.paid_to_account_currency = 'IDR'
+	pe.paid_amount = doc.advance_amount
+	pe.received_amount = doc.advance_amount - doc.paid_amount
+	pe.append('references', {
+		'reference_doctype': 'Employee Advance',
+		'reference_name': doc.name,
+		'total_amount': doc.advance_amount,
+		'allocated_amount': doc.advance_amount - doc.paid_amount,
+		'outstanding_amount': doc.advance_amount - doc.paid_amount,
+	})
+	pe.party_name = frappe.db.get_value(pe.party_type, pe.party, 'employee_name')
+	pe.paid_from_account_type = frappe.get_cached_value('Account', account, 'account_type')
+	pe.paid_to_account_type = frappe.get_cached_value('Account', doc.advance_account, 'account_type')
+	pe.total_allocated_amount = abs(doc.advance_amount)
+	pe.bank_account = bank_account if bank_account else None
+	pe.party_bank_account = party_bank_account if party_bank_account else None
+	pe.save()
+	frappe.msgprint(
+		msg=f'Payment Entry {pe.name} created for Employee Advance {doc.name}.',
+		title='Auto Create Payment Entry',
+		indicator='green',
+		primary_action={
+			'label': 'View Payment Entry',
+			'client_action': 'frappe.set_route',
+			'args': ['Form', 'Payment Entry', pe.name],
+		}
+	)
