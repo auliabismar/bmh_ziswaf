@@ -13,6 +13,7 @@
   "column_break_kssz",
   "branch",
   "branch_code",
+  "npwz",
   "contacts_tab",
   "section_break_qkzb",
   "address_html",
@@ -23,6 +24,7 @@
   {
    "fieldname": "donor_name",
    "fieldtype": "Data",
+   "in_list_view": 1,
    "label": "Donor Name",
    "reqd": 1
   },
@@ -44,6 +46,7 @@
    "fetch_from": "branch.custom_prefix",
    "fieldname": "branch_code",
    "fieldtype": "Data",
+   "in_list_view": 1,
    "label": "Branch Code",
    "no_copy": 1,
    "read_only": 1
@@ -82,12 +85,18 @@
    "depends_on": "eval:!doc.__islocal",
    "fieldname": "section_break_qkzb",
    "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "npwz",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "NPWZ"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-10-31 16:05:28.615402",
+ "modified": "2026-01-13 17:13:45.687228",
  "modified_by": "Administrator",
  "module": "ZISWaf",
  "name": "Donor",
