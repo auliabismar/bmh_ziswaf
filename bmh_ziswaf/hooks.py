@@ -31,6 +31,7 @@ required_apps = ['erpnext']
 doctype_js = {
   "Employee Advance" : "public/js/employee_advance.js",
   "Expense Claim" : "public/js/expense_claim.js",
+  "Payment Entry" : "public/js/payment_entry.js",
 }
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}

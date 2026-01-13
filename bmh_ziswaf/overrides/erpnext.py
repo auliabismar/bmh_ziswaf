@@ -73,3 +73,79 @@ def get_payment_entry_for_employee(dt, dn, party_amount=None, bank_account=None,
 		pe.set_amounts()
 
 	return pe
+
+@frappe.whitelist()
+@frappe.validate_and_sanitize_search_inputs
+def get_accounts_for_payment(doctype, txt, searchfield, start, page_len, filters):
+    """
+    Custom query for Payment Entry paid_from field
+    Returns accounts matching either account_type OR root_type criteria
+    """
+    account_types = filters.get("account_types", [])
+    root_types = filters.get("root_types", [])
+    company = filters.get("company")
+    
+    # Ensure lists are properly formatted
+    if isinstance(account_types, str):
+        account_types = [account_types]
+    if isinstance(root_types, str):
+        root_types = [root_types]
+    
+    conditions = []
+    values = []
+    
+    # Build the OR condition for account_type and root_type
+    or_conditions = []
+    
+    if account_types:
+        account_type_placeholders = ", ".join(["%s"] * len(account_types))
+        or_conditions.append(f"account_type IN ({account_type_placeholders})")
+        values.extend(account_types)
+    
+    if root_types:
+        root_type_placeholders = ", ".join(["%s"] * len(root_types))
+        or_conditions.append(f"root_type IN ({root_type_placeholders})")
+        values.extend(root_types)
+    
+    # Combine OR conditions
+    if or_conditions:
+        conditions.append(f"({' OR '.join(or_conditions)})")
+    
+    # Add other mandatory conditions
+    conditions.append("is_group = %s")
+    values.append(0)
+    
+    conditions.append("company = %s")
+    values.append(company)
+    
+    conditions.append("disabled = %s")
+    values.append(0)
+    
+    # Add search condition if text is provided
+    if txt:
+        conditions.append("(name LIKE %s OR account_name LIKE %s)")
+        values.extend([f"%{txt}%", f"%{txt}%"])
+    
+    # Build final query
+    where_clause = " AND ".join(conditions)
+    
+    query = f"""
+        SELECT 
+            name, 
+            account_name, 
+            account_type, 
+            root_type,
+            CONCAT_WS(' - ', name, account_name) as label
+        FROM `tabAccount`
+        WHERE {where_clause}
+        ORDER BY 
+            CASE WHEN name LIKE %s THEN 0 ELSE 1 END,
+            idx DESC,
+            name
+        LIMIT %s OFFSET %s
+    """
+    
+    # Add ordering and pagination parameters
+    values.extend([f"{txt}%" if txt else "%", page_len, start])
+    
+    return frappe.db.sql(query, values, as_dict=False)
